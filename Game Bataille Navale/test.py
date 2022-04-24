@@ -1,6 +1,3 @@
-import os
-
-dataPlayer1 = os.path.getsize("gridDataPlayer1.txt")
-dataPlayer2 = os.path.getsize("gridDataPlayer2.txt")
-
-print(dataPlayer1, dataPlayer2)
+data = {'a': 1, 'b': 2, 'c': 3}
+data.pop('a')
+print(data)

@@ -2,6 +2,7 @@ import sys
 import pygame
 from win32api import GetSystemMetrics
 import random
+import json
 
 # initialize the modules
 pygame.init()
@@ -32,7 +33,15 @@ SIZE_GRID_SMALL = 7
 SIZE_GRID_MEDIUM = 10
 
 
-
+# create the textbox class
+class Text_box:
+    def __init__(self, text, pos, size, color):
+        self.pos = pos
+        font = pygame.font.Font(None, size)
+        self.text = font.render(text, True, color)
+    
+    def draw(self):
+        window.blit(self.text, self.pos)
 
 
 
@@ -69,8 +78,10 @@ class Button:
     def hover(self):
         if self.rect.collidepoint(pygame.mouse.get_pos()):
             self.change(RED, YELLOW)
+            return True
         else:
             self.change(WHITE, BLACK)
+            return False
 
 
 # create the input box class
@@ -101,7 +112,7 @@ class Input_box:
         if event.type == pygame.KEYDOWN and self.active:
             if event.key == pygame.K_BACKSPACE:
                 self.user_text = self.user_text[:-1]
-            else:
+            elif event.key != pygame.K_RETURN:
                 self.user_text += event.unicode
             self.text_surface = self.font.render(self.user_text, True, BLACK)   
 
@@ -259,9 +270,15 @@ class Grid:
         elif self.getData == "Random Small":
             self.dataTarget = gridDataRandom(SIZE_GRID_SMALL)
         elif self.getData == "Player1":
-            self.dataTarget = self.findGridDataPlayer1()
+            with open("players_data.json", "r") as f:
+                data = f.read()
+                data = json.loads(data)
+            self.dataTarget = data['grid1']
         elif self.getData == "Player2":
-            self.dataTarget = self.findGridDataPlayer2()
+            with open("players_data.json", "r") as f:
+                data = f.read()
+                data = json.loads(data)
+            self.dataTarget = data['grid2']
 
         self.x, self.y = pos
         self.blockSize = 35
@@ -300,29 +317,14 @@ class Grid:
             i.attacked(self.event)
         
     
-    def save(self, file_path):
-        with open(file_path, 'w') as data:
-            for i in self.listSquare:
-                if i.isTarget():
-                    data.write(str(1) + '\n')
-                else:
-                    data.write(str(0) + '\n')
-
-    def findGridDataPlayer1(self):
-        gridData = open('gridDataPlayer1.txt')
-        data = []
-        for line in gridData:
-            data.append(int(line[:-1]))
-        gridData.close()
-        return data
-
-    def findGridDataPlayer2(self):
-        gridData = open('gridDataPlayer2.txt')
-        data = []
-        for line in gridData:
-            data.append(int(line[:-1]))
-        gridData.close()
-        return data
+    def save(self):
+        dataGrid = []
+        for i in self.listSquare:
+            if i.isTarget():
+                dataGrid.append(1)
+            else:
+                dataGrid.append(0)
+        return dataGrid
     
     def onAttacked(self):
         for i in self.listSquare:
@@ -368,11 +370,14 @@ class Grid:
 shipL = 5
 shipM = 3
 shipS = 1
-dataTarget = []
-listTargetChose = []
+
 
 def gridDataRandom(sizeGrid):
     global dataTarget, listTargetChose
+    
+    dataTarget = []
+    listTargetChose = []
+
     for i in range(sizeGrid):
         line = []
         for j in range(sizeGrid):
@@ -398,6 +403,7 @@ def gridDataRandom(sizeGrid):
 
 def shipDataRandom(sizeShip, amount, sizeGrid):
     global dataTarget, listTargetChose
+
 
     ship_Added = 0
     while ship_Added < amount:
