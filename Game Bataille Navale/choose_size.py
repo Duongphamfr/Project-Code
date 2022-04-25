@@ -2,7 +2,8 @@ import sys
 import pygame
 import index
 import json
-import set_grid_medium
+import add_players
+import set_grid
 
 
 
@@ -37,23 +38,17 @@ def main():
             if button2.hover():
                 # mo ta game"""
             if backButton.click(event):
-                accueil.main()
-            """if button1.click(event):
+                add_players.main()
+            if button1.click(event):
                 data["size"] = "small"
-                with open("players_data.txt", "w") as f:
-                    f.write(str(data))
-                if data["mode"] == "mono":
-                    # set_grid_small_1_player.main()
-                elif data['mode'] == "multi":
-                    # set_grid_small_2_players.main()"""
+                with open("players_data.json", "w") as f:
+                    f.write(str(data).replace("\'", "\""))
+                set_grid.main()
             if button2.click(event):
                 data["size"] = "medium"
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
-                if data['mode'] == "mono":
-                    set_grid_medium.main()
-                elif data['mode'] == "multi":
-                    set_grid_medium.main()
+                set_grid.main()
         pygame.display.update()
 
 

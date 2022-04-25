@@ -19,7 +19,7 @@ def main():
         data = f.read()
         data = json.loads(data)
     
-    winner = index.Text_box('The winner is' + str(data['winner']), (300, 100), 50, index.BLACK)
+    winner = index.Text_box('The winner is ' + str(data['winner']), (300, 100), 50, index.BLACK)
 
 
     running = True

@@ -109,10 +109,10 @@ class Input_box:
                 else:
                     self.active = False
                 self.color = COLOR_ACTIVE_BOX if self.active else COLOR_INACTIVE_BOX
-        if event.type == pygame.KEYDOWN and self.active:
+        if (event.type == pygame.KEYDOWN) and (self.active):
             if event.key == pygame.K_BACKSPACE:
                 self.user_text = self.user_text[:-1]
-            elif event.key != pygame.K_RETURN:
+            elif (event.key != pygame.K_RETURN) and (len(self.user_text) < 15):
                 self.user_text += event.unicode
             self.text_surface = self.font.render(self.user_text, True, BLACK)   
 
@@ -165,9 +165,9 @@ class Square(Ship):
         self.dataTarget = dataTarget
         # self.confirmed = False
         if dataTarget == 0:
-            self.target = False
+            self.isTarget = False
         elif dataTarget == 1:
-            self.target = True
+            self.isTarget = True
         self.hovered = False
         self.chose = False
         self.isAttacked = False
@@ -190,13 +190,13 @@ class Square(Ship):
                 self.chose = False
 
         if self.chose:
-            self.target = True
+            self.isTarget = True
             self.color = RED
         elif self.hovered:
-            self.target = False
+            self.isTarget = False
             self.color = YELLOW
         else:
-            self.target = False
+            self.isTarget = False
             self.color = BLACK
 
     def attacked(self, event):
@@ -207,51 +207,22 @@ class Square(Ship):
                 if pygame.mouse.get_pressed()[0]:
                     if self.rect.collidepoint(mouse_x, mouse_y):
                         if not self.isAttacked:
-                            if not self.target:
+                            if not self.isTarget:
                                 self.isChangeTurn = True
                             self.isAttacked = True
         if self.isAttacked:
-            if self.target:
+            if self.isTarget:
                 self.color = BLUE
             else:
                 self.color = WHITE
 
-
-    def isTarget(self):
-        if self.target:
-            return True
-        else:
-            return False
-    
     def isKilled(self):
         self.isAttacked = True
-        if not self.target:
+        if not self.isTarget:
             self.isChangeTurn = True
-    
-
 
     def draw(self):
         pygame.draw.rect(window, self.color, self.rect)
-
-    def dead(self):
-        if self.isAttacked:
-            return True
-        else:
-            return False
-    
-    def onAttacked(self):
-        self.isOnAttacked = True
-    
-    def offAttacked(self):
-        self.isOnAttacked = False
-        
-    def resetTurn(self):
-        self.isChangeTurn = False
-    
-    def changeTurn(self):
-        return self.isChangeTurn
-
-
 
 # create the grid
 
@@ -265,10 +236,8 @@ class Grid:
             self.dataTarget = []
             for i in range(self.size * self.size):
                 self.dataTarget.append(0)
-        elif self.getData == "Random Medium":
-            self.dataTarget = gridDataRandom(SIZE_GRID_MEDIUM)
-        elif self.getData == "Random Small":
-            self.dataTarget = gridDataRandom(SIZE_GRID_SMALL)
+        elif self.getData == "Random":
+            self.dataTarget = gridDataRandom()
         elif self.getData == "Player1":
             with open("players_data.json", "r") as f:
                 data = f.read()
@@ -315,56 +284,54 @@ class Grid:
         self.event = event
         for i in self.listSquare:
             i.attacked(self.event)
-        
-    
+
     def save(self):
         dataGrid = []
         for i in self.listSquare:
-            if i.isTarget():
+            if i.isTarget:
                 dataGrid.append(1)
             else:
                 dataGrid.append(0)
         return dataGrid
-    
+
     def onAttacked(self):
         for i in self.listSquare:
-            i.onAttacked()
-    
+            i.isOnAttacked = True
+
     def offAttacked(self):
         for i in self.listSquare:
-            i.offAttacked()
-
+            i.isOnAttacked = False
 
     def randomAttacked(self):
         i = random.choice(self.listSquare)
-        while i.dead():
+        while i.isAttacked:
             i = random.choice(self.listSquare)
         i.isKilled()
     
     def countTarget(self):
         self.target = 0
         for i in self.listSquare:
-            if i.isTarget():
+            if i.isTarget:
                 self.target += 1
         return self.target
     
     def countTargetAlive(self):
         self.targetAlive = 0
         for i in self.listSquare:
-            if (i.isTarget()) and (not i.dead()):
+            if (i.isTarget) and (not i.isAttacked):
                 self.targetAlive += 1
         return self.targetAlive
 
     def changeTurn(self):
         self.isChangeTurn = False
         for i in self.listSquare:
-            if i.changeTurn():
+            if i.isChangeTurn:
                 self.isChangeTurn = True
         return self.isChangeTurn
     
     def resetTurn(self):
         for i in self.listSquare:
-            i.resetTurn()
+            i.isChangeTurn = False
 
 ##################################################################################
 shipL = 5
@@ -372,11 +339,20 @@ shipM = 3
 shipS = 1
 
 
-def gridDataRandom(sizeGrid):
+def gridDataRandom():
     global dataTarget, listTargetChose
     
     dataTarget = []
     listTargetChose = []
+
+    with open("players_data.json", "r") as f:
+        data = f.read()
+        data = json.loads(data)
+
+    if data['size'] == 'small':
+        sizeGrid = 7
+    elif data['size'] == 'medium':
+        sizeGrid = 10
 
     for i in range(sizeGrid):
         line = []
@@ -384,11 +360,11 @@ def gridDataRandom(sizeGrid):
             line.append(0)
         dataTarget.append(line)
     
-    if sizeGrid == SIZE_GRID_SMALL:
+    if data['size'] == 'small':
         # 1 shipM and 5 shipS
         shipDataRandom(shipM, 1, sizeGrid)
         shipDataRandom(shipS, 5, sizeGrid)
-    if sizeGrid == SIZE_GRID_MEDIUM:
+    if data['size'] == 'medium':
         # 1 shipL and 2 shipM and 5 shipS
         shipDataRandom(shipL, 1, sizeGrid)
         shipDataRandom(shipM, 2, sizeGrid)

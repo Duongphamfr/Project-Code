@@ -5,8 +5,9 @@ with open("players_data.json", "r") as f:
     data = f.read()
     data = json.loads(data)
 
-
 if data['size'] == 'medium':
+    gridSize = 10
+    totalTarget = 16
     # MEDIUM SIZE
 
     # create the Ship
@@ -37,7 +38,9 @@ if data['size'] == 'medium':
         ship8.__init__((35, 35), (1300, 500))
         listShip = [ship1, ship2, ship3, ship4, ship5, ship6, ship7, ship8]
 
-elif data['size'] == 'multi':
+elif data['size'] == 'small':
+    gridSize = 7
+    totalTarget = 8
     # SMALL SIZE
 
     # create the Ship

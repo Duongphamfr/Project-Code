@@ -7,7 +7,7 @@ import json
 
 
 backButton = index.Button("BACK",(0,0),80)
-textGuide = index.Text_box("Fill your name and press Enter to continue", (800, 1000), 50, index.BLACK)
+textGuide = index.Text_box("Fill your name and press Enter to continue", (100, 600), 50, index.BLACK)
 
 # setting for the infinity loop
 clock = pygame.time.Clock()

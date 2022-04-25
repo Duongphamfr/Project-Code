@@ -3,35 +3,43 @@ import pygame
 import index
 import json
 import result
+import accueil
 
-
+quitButton = index.Button("QUIT", (1500, 0), 50)
 
 # setting for the infinity loop
 clock = pygame.time.Clock()
 FPS = 60
 
 def main():
+
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
+    
+    if data['size'] == 'small':
+        gridSize = 7
+    elif data['size'] == 'medium':
+        gridSize = 10
+    
+    turn = data['name1']
 
     if data['mode'] == 'mono':
-        grid1 = index.Grid(10, (200, 300), getData="Player1")
-        gridAuto = index.Grid(10, (1200, 300), getData="Random Medium")
+        grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
+        gridAuto = index.Grid(gridSize, (1200, 300), getData="Random")
 
-        name1 = index.Text_box(data['name1'], (200, 150), 50, index.BLACK)
-        nameAuto = index.Text_box("Computer", (1200, 150), 50, index.BLACK)
-
-
-
-        turn = "player1"
+        name1 = index.Text_box("Grid of " + data['name1'], (200, 150), 50, index.BLACK)
+        nameAuto = index.Text_box("Grid of " + "Computer", (1200, 150), 50, index.BLACK)
         
         running = True
         while running:
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
+            quitButton.draw()
             grid1.draw()
             gridAuto.draw()
+            turnText = index.Text_box("Turn of: " + turn, (700, 100), 50, index.BLACK)
+            turnText.draw()
             # draw text name player
             name1.draw()
             nameAuto.draw()
@@ -47,7 +55,9 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if turn == "player1":
+                if quitButton.click(event):
+                    accueil.main()
+                if turn == data['name1']:
                     # draw text turn
                     grid1.resetTurn()
                     grid1.offAttacked()
@@ -59,8 +69,8 @@ def main():
                             f.write(str(data).replace("\'", "\""))
                         result.main()
                     if gridAuto.changeTurn():
-                        turn = "auto"
-                if turn == "auto":
+                        turn = "Computer"
+                if turn == "Computer":
                     # draw text turn
                     gridAuto.resetTurn()
                     gridAuto.offAttacked()
@@ -73,24 +83,24 @@ def main():
                             f.write(str(data).replace("\'", "\""))
                         result.main()
                     if grid1.changeTurn():
-                        turn = "player1"
+                        turn = data['name1']
 
     elif data['mode'] == 'multi':
 
-        grid1 = index.Grid(10, (200, 300), getData="Player1")
-        grid2 = index.Grid(10, (1200, 300), getData="Player2")
-        name1 = index.Text_box(data['name1'], (200, 150), 50, index.BLACK)
-        name2 = index.Text_box(data['name2'], (1200, 150), 50, index.BLACK)
+        grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
+        grid2 = index.Grid(gridSize, (1200, 300), getData="Player2")
+        name1 = index.Text_box("Grid of" + data['name1'], (200, 150), 50, index.BLACK)
+        name2 = index.Text_box("Grid of" + data['name2'], (1200, 150), 50, index.BLACK)
 
 
 
-
-        turn = "player1"
-        
         running = True
         while running:
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
+            quitButton.draw()
+            turnText = index.Text_box("Turn of: " + turn, (700, 100), 50, index.BLACK)
+            turnText.draw()
             grid1.draw()
             grid2.draw()
             # draw text name player
@@ -108,7 +118,9 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if turn == "player1":
+                if quitButton.click(event):
+                    accueil.main()
+                if turn == data['name1']:
                     # draw text turn
                     grid1.resetTurn()
                     grid1.offAttacked()
@@ -120,8 +132,8 @@ def main():
                             f.write(str(data).replace("\'", "\""))
                         result.main()
                     if grid2.changeTurn():
-                        turn = "player2"
-                if turn == "player2":
+                        turn = data['name2']
+                if turn == data['name2']:
                     # draw text turn
                     grid2.resetTurn()
                     grid2.offAttacked()
@@ -133,4 +145,4 @@ def main():
                             f.write(str(data).replace("\'", "\""))
                         result.main()
                     if grid1.changeTurn():
-                        turn = "player1"
+                        turn = data['name1']

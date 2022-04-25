@@ -3,6 +3,10 @@ import pygame
 import index
 import battle
 import json
+import choose_size
+from importlib import reload
+
+backButton = index.Button("BACK",(0,0),80)
 
 # setting for the infinity loop
 clock = pygame.time.Clock()
@@ -10,9 +14,9 @@ FPS = 60
 
 def main():
     import data_map
+    reload(data_map)
     listShip = data_map.listShip
-    grid = index.Grid(10, (200, 350), listShip)
-
+    grid = index.Grid(data_map.gridSize, (200, 350), listShip)
 
 
     with open("players_data.json", "r") as f:
@@ -20,8 +24,8 @@ def main():
         data = json.loads(data)
 
     if data['mode'] == 'mono':
-        button1 = index.Button("Confirm grid", (50, 50), 30)
-        button3 = index.Button("WAR", (100, 100), 30)
+        button1 = index.Button("Confirm grid", (100, 150), 30)
+        button3 = index.Button("WAR", (100, 700), 30)
 
         running = True
 
@@ -31,6 +35,7 @@ def main():
 
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
+            backButton.draw()
             grid.draw()
             if ('grid1' not in data):
                 button1.draw()
@@ -44,14 +49,16 @@ def main():
                     pygame.quit()
                     sys.exit()
                 grid.handle_event(event)
+                if backButton.click(event):
+                    choose_size.main()
                 for ship in listShip:
                     ship.handle_event(event)
-                if ('grid1' not in data) and (target == 16):
+                if ('grid1' not in data) and (target == data_map.totalTarget):
                     if button1.click(event):
                         data['grid1'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
-                        grid.__init__(10, (200, 350), listShip)
+                        grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
                         print("Saved Player 1")
                 if ('grid1' in data):
@@ -59,9 +66,9 @@ def main():
                         battle.main()
 
     elif data['mode'] == 'multi':
-        button1 = index.Button("Confirm grid of player 1", (50, 50), 30)
-        button2 = index.Button("Confirm grid of player 2", (500, 50), 30)
-        button3 = index.Button("WAR", (100, 100), 30)
+        button1 = index.Button("Confirm grid of player 1", (100, 150), 30)
+        button2 = index.Button("Confirm grid of player 2", (500, 150), 30)
+        button3 = index.Button("WAR", (100, 700), 30)
 
         running = True
 
@@ -71,6 +78,7 @@ def main():
 
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
+            backButton.draw()
             grid.draw()
             if ('grid1' not in data):
                 button1.draw()
@@ -86,21 +94,23 @@ def main():
                     pygame.quit()
                     sys.exit()
                 grid.handle_event(event)
+                if backButton.click(event):
+                    choose_size.main()
                 for ship in listShip:
                     ship.handle_event(event)
-                if ('grid1' not in data) and (target == 16):
+                if ('grid1' not in data) and (target == data_map.totalTarget):
                     if button1.click(event):
                         data['grid1'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
-                        grid.__init__(10, (200, 350), listShip)
+                        grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
-                if ('grid2' not in data) and (target == 16):
+                if ('grid2' not in data) and (target == data_map.totalTarget):
                     if button2.click(event):
                         data['grid2'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
-                        grid.__init__(10, (200, 350), listShip)
+                        grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
                 if ('grid1' in data) and ('grid2' in data):
                     if button3.click(event):
