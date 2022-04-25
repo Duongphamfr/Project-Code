@@ -51,7 +51,3 @@ def main():
                 choose_size.main()
                     
         pygame.display.update()
-
-
-if __name__ == '__main__':
-    main()
