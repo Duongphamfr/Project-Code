@@ -15,6 +15,7 @@ FPS = 60
 def main():
     import data_map
     reload(data_map)
+
     listShip = data_map.listShip
     grid = index.Grid(data_map.gridSize, (200, 350), listShip)
 
