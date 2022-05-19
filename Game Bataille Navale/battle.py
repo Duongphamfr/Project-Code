@@ -85,12 +85,12 @@ def main():
                     if grid1.changeTurn():
                         turn = data['name1']
 
-    elif data['mode'] == 'multi':
+    elif data['mode'] == 'multi1':
 
         grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
         grid2 = index.Grid(gridSize, (1200, 300), getData="Player2")
-        name1 = index.Text_box("Grid of" + data['name1'], (200, 150), 50, index.BLACK)
-        name2 = index.Text_box("Grid of" + data['name2'], (1200, 150), 50, index.BLACK)
+        name1 = index.Text_box("Grid of " + data['name1'], (200, 150), 50, index.BLACK)
+        name2 = index.Text_box("Grid of " + data['name2'], (1200, 150), 50, index.BLACK)
 
 
 

@@ -18,7 +18,7 @@ def main():
         data = f.read()
         data = json.loads(data)
 
-    if data['mode'] == 'mono':
+    if data['mode'] == 'mono' or data['mode'] == 'multi2':
         input1 = index.Input_box((600,100),(650,300))
         text1 = index.Text_box("Player's Name", (650, 250), 80, index.BLACK)
         running = True
@@ -40,13 +40,21 @@ def main():
                 if len(input1.user_text) != 0:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_RETURN:
-                            data["name1"] = input1.user_text
-                            with open("players_data.json", "w") as f:
-                                f.write(str(data).replace("\'", "\""))
-                            choose_size.main()
+                            if data['host'] == 'True' or data['mode'] == 'mono':
+                                data["name1"] = input1.user_text
+                                with open("players_data.json", "w") as f:
+                                    f.write(str(data).replace("\'", "\""))
+                                choose_size.main()
+                            elif data['host'] == 'False':
+                                data["name2"] = input1.user_text
+                                with open("players_data.json", "w") as f:
+                                    f.write(str(data).replace("\'", "\""))
+                                join_room.main()
+
+
             pygame.display.update()
     
-    elif data['mode'] == 'multi':
+    elif data['mode'] == 'multi1':
         input1 = index.Input_box((600,100),(300,300))
         input2 = index.Input_box((600,100),(1000,300))
         text1 = index.Text_box("Name of Player 1", (300, 250), 80, index.BLACK)

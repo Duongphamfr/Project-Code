@@ -41,7 +41,7 @@ def main():
                     data.pop('winner')
                     data.pop('grid1')
                     data.pop('size')
-                if data['mode'] == 'multi':
+                if data['mode'] == 'multi1':
                     data.pop('winner')
                     data.pop('grid1')
                     data.pop('grid2')

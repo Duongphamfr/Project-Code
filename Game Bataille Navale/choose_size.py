@@ -43,11 +43,17 @@ def main():
                 data["size"] = "small"
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
-                set_grid.main()
+                if data['mode'] == 'multi2':
+                    create_room.main()
+                else:
+                    set_grid.main()
             if button2.click(event):
                 data["size"] = "medium"
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
-                set_grid.main()
+                if data['mode'] == 'multi2':
+                    create_room.main()
+                else:
+                    set_grid.main()
         pygame.display.update()
 

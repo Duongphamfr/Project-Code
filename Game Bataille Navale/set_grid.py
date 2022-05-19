@@ -66,7 +66,7 @@ def main():
                     if button3.click(event):
                         battle.main()
 
-    elif data['mode'] == 'multi':
+    elif data['mode'] == 'multi1':
         button1 = index.Button("Confirm grid of player 1", (100, 150), 30)
         button2 = index.Button("Confirm grid of player 2", (500, 150), 30)
         button3 = index.Button("WAR", (100, 700), 30)
