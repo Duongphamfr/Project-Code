@@ -1,6 +1,7 @@
 import sys
+from turtle import width
 import pygame
-from win32api import GetSystemMetrics
+import pyautogui
 import random
 import json
 
@@ -10,7 +11,8 @@ pygame.font.init()
 pygame.mixer.init()
 
 # set the screen system
-width, height = GetSystemMetrics(0), GetSystemMetrics(1)
+
+width, height = pyautogui.size()
 window = pygame.display.set_mode((width, height-80))
 pygame.display.set_caption("BATAILLE NAVIRE")
 
