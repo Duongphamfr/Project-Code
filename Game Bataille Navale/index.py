@@ -1,5 +1,3 @@
-import sys
-from turtle import width
 import pygame
 import pyautogui
 import random
@@ -18,7 +16,6 @@ pygame.display.set_caption("BATAILLE NAVIRE")
 
 bg_img = pygame.image.load("Assets/bg-accueil.jpg")
 bg_img = pygame.transform.scale(bg_img, (width, height-80))
-
 
 # set the color
 WHITE = (255, 255, 255)
@@ -416,3 +413,21 @@ def shipDataRandom(sizeShip, amount, sizeGrid):
                     dataTarget[i][xShip] = 1
                     listTargetChose.append((i, xShip))
                 ship_Added += 1
+
+
+
+
+##########################################################################
+class Game:
+    def __init__(self):
+        self.turn = 1
+        self.bothConnected = False
+        self.p1Ready, self.p2Ready = False
+        self.name1, self.name2, self.size = ""
+        self.grid1, self.grid2 = NULL
+        self.winner = NULL
+
+    def reset(self):
+        self.p1Ready, self.p2Ready = False
+        self.grid1, self.grid2 = NULL
+        self.winner = NULL

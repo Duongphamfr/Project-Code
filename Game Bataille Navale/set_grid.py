@@ -5,6 +5,8 @@ import battle
 import json
 import choose_size
 from importlib import reload
+import create_room
+import join_room
 
 backButton = index.Button("BACK",(0,0),80)
 
@@ -116,3 +118,64 @@ def main():
                 if ('grid1' in data) and ('grid2' in data):
                     if button3.click(event):
                         battle.main()
+
+    if data['mode'] == 'multi2':
+        if data['playerId'] == '1':
+            n = create_room.n
+        elif data['playerId'] == '2':
+            n = join_room.n 
+
+
+        button1 = index.Button("Confirm grid", (100, 150), 30)
+        button2 = index.Button("Waiting for player 2", (100, 250), 30)
+
+
+        running = True
+
+        while running:
+            try:
+                game = n.send("get")
+            except:
+                running = False
+                print("Couldn't get game")
+                break
+
+            # get the number of target
+            target = grid.countTarget()
+
+            clock.tick(FPS)
+            index.window.blit(index.bg_img, (0, 0))
+            backButton.draw()
+            grid.draw()
+            if 'grid1' not in data:
+                button1.draw()
+            if 'grid1' in data:
+                button2.draw()
+
+            for ship in listShip:
+                ship.draw()
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                grid.handle_event(event)
+                if backButton.click(event):
+                    choose_size.main()
+                for ship in listShip:
+                    ship.handle_event(event)
+                if ('grid1' not in data) and (target == data_map.totalTarget):
+                    if button1.click(event):
+                        data['grid1'] = grid.save()
+                        with open("players_data.json", "w") as f:
+                            f.write(str(data).replace("\'", "\""))
+                        grid.__init__(data_map.gridSize, (200, 350), listShip)
+                        data_map.reset_listShip()
+                        print("Saved Player Grid")
+                        if data['playerId'] == '1':
+                            game.p1Ready = True
+                        else:
+                            game.p2Ready = True
+            if (game.p1Ready) and (game.p2Ready):
+                game = n.send("get")
+                battle.main()

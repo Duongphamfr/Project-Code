@@ -4,6 +4,8 @@ import index
 import accueil
 import choose_size
 import json
+import battle
+import set_grid
 
 # setting for the infinity loop
 clock = pygame.time.Clock()
@@ -15,15 +17,26 @@ button3 = index.Button('QUIT',( 650, 700), 50)
 
 
 def main():
+    running = True
+
+    n = battle.n
+
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
     
-    winner = index.Text_box('The winner is ' + str(data['winner']), (300, 100), 50, index.BLACK)
 
 
-    running = True
     while running:
+        try:
+            game = n.send("get")
+            data['winner'] = game.winner   
+        except:
+            running = False
+            print("Couldn't get game")
+        
+        winner = index.Text_box('The winner is ' + str(data['winner']), (300, 100), 50, index.BLACK)
+
         clock.tick(FPS)
         index.window.blit(index.bg_img, (0, 0))
         button1.draw()
@@ -46,6 +59,13 @@ def main():
                     data.pop('grid1')
                     data.pop('grid2')
                     data.pop('size')
+                if data['mode'] == 'multi2':
+                    data.pop('winner')
+                    data.pop('grid1')
+                    data.pop('grid2')
+                    game = n.send('reset')
+                    set_grid.main()
+
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
                 choose_size.main()

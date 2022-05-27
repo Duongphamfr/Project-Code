@@ -1,58 +1,65 @@
+import pickle
 import socket
 from _thread import *
-import sys
+import index
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server = socket.gethostname()
-port = 6803
+port = 5555
 
 server_ip = socket.gethostbyname(server)
 
 try:
-    s.bind((server, port))
+    s.bind((server_ip, port))
 except socket.error as e:
     print(str(e))
 
 s.listen(2)
-print("Waiting for a connection")
+print("Waiting for a connection, Server Started")
 
-currentId = "0"
-# pos = ["0:50,50", "1:100,100"]
+connected = set()
+player = 0
 
-def threaded_client(conn):
-    global currentId, pos
-    conn.send(str.encode(currentId))
-    currentId = "1"
+def threaded_client(conn, player):
+    conn.send(str.encode(player))
+
     reply = ''
     while True:
         try:
-            data = conn.recv(2048)
-            reply = data.decode('utf-8')
+            data = conn.recv(4096).decode()
+
             if not data:
                 conn.send(str.encode("Goodbye"))
                 break
             else:
-                print("Received: " + reply)
-                """arr = reply.split(":")
-                id = int(arr[0])
-                pos[id] = reply
-
-                if id == 0: nid = 1
-                if id == 1: nid = 0
-
-                reply = pos[nid][:]"""
-                print("Sending: " + reply)
-
-            conn.sendall(str.encode(reply))
+                if data == "reset":
+                    game.reset()
+                elif data != "get":
+                    game.play(player, data) # data la grid
+                
+                conn.sendall(pickle.dumps(game))
+                
         except:
             break
 
     print("Connection Closed")
     conn.close()
 
-while True:
-    conn, addr = s.accept()
-    print("Connected to: ", addr)
+def main():
+    global game 
+    while True:
+        conn, addr = s.accept()
+        print("Connected to: ", addr)
 
-    start_new_thread(threaded_client, (conn, addr))
+        if player == 0:
+            game = index.Game()
+            print("Creating a new game...")
+        else:
+            game.bothConnected = True
+            player = 1
+
+        start_new_thread(threaded_client, (conn, player))
+
+if __name__ == '__main__':
+    main()

@@ -4,6 +4,7 @@ import index
 import accueil
 import choose_size
 import json
+import join_room
 
 
 backButton = index.Button("BACK",(0,0),80)
@@ -40,12 +41,12 @@ def main():
                 if len(input1.user_text) != 0:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_RETURN:
-                            if data['host'] == 'True' or data['mode'] == 'mono':
+                            if data['playerId'] == '1' or data['mode'] == 'mono':
                                 data["name1"] = input1.user_text
                                 with open("players_data.json", "w") as f:
                                     f.write(str(data).replace("\'", "\""))
                                 choose_size.main()
-                            elif data['host'] == 'False':
+                            elif data['playerId'] == '2':
                                 data["name2"] = input1.user_text
                                 with open("players_data.json", "w") as f:
                                     f.write(str(data).replace("\'", "\""))

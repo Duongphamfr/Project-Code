@@ -4,8 +4,7 @@ import index
 import json
 import add_players
 import set_grid
-
-
+import create_room
 
 # create the button
 backButton = index.Button("BACK", (0, 0), 80)
@@ -33,10 +32,6 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            """if button1.hover():
-                # mo ta game
-            if button2.hover():
-                # mo ta game"""
             if backButton.click(event):
                 add_players.main()
             if button1.click(event):

@@ -1,3 +1,4 @@
+from copyreg import pickle
 import socket
 
 class Network:
@@ -10,22 +11,21 @@ class Network:
             self.host = str(self.ip_addr) # get IP address
         else:
             self.host = ip_addr
-        self.port = 6803
+        self.port = 5555
         self.addr = (self.host, self.port)
         self.id = self.connect()
 
     def connect(self):
-        self.client.connect(self.addr)
-        return self.client.recv(2048).decode()
+        try:
+            self.client.connect(self.addr)
+            return self.client.recv(2048).decode()
+        except:
+            pass
 
     def send(self, data):
-        """
-        :param data: str
-        :return: str
-        """
         try:
             self.client.send(str.encode(data))
-            reply = self.client.recv(2048).decode()
+            reply = pickle.loads(self.client.recv(4096))
             return reply
         except socket.error as e:
             return str(e)

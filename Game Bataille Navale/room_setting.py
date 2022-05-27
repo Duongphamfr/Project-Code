@@ -1,12 +1,12 @@
+import imp
 import sys
 import pygame
 import index
 import accueil
-import choose_size
 import json
-import create_room
 import join_room
 import add_players
+import network
 
 
 backButton = index.Button("BACK",(0,0),80)
@@ -17,7 +17,7 @@ button2 = index.Button("Join a room", (300, 700), 100)
 clock = pygame.time.Clock()
 FPS = 60
 
-#menu game
+# menu game
 def main():
     with open("players_data.json", "r") as f:
         data = f.read()
@@ -37,16 +37,15 @@ def main():
             if backButton.click(event):
                 accueil.main()
             if button1.click(event):
-                data["host"] = "True"
+                data["playerId"] = '1'
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
-                # create_room.main()
                 add_players.main()
             if button2.click(event):
-                data["host"] = "False"
+                data["playerId"] = '2'
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
-                join_room.main()
+                add_players.main()
 
         pygame.display.update()
     
