@@ -6,9 +6,9 @@ import index
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server = socket.gethostname()
-port = 5555
+port = 9999
 
-server_ip = socket.gethostbyname(server)
+server_ip = socket.gethostbyname('localhost')
 
 try:
     s.bind((server_ip, port))
@@ -22,7 +22,7 @@ connected = set()
 player = 0
 
 def threaded_client(conn, player):
-    conn.send(str.encode(player))
+    conn.send(str.encode(str(player)))
 
     reply = ''
     while True:
@@ -30,7 +30,7 @@ def threaded_client(conn, player):
             data = conn.recv(4096).decode()
 
             if not data:
-                conn.send(str.encode("Goodbye"))
+                print("Code dont excuted")
                 break
             else:
                 if data == "reset":
@@ -39,25 +39,28 @@ def threaded_client(conn, player):
                     game.play(player, data) # data la grid
                 
                 conn.sendall(pickle.dumps(game))
-                
-        except:
+
+        except Exception as e:
+            print(e)
             break
 
     print("Connection Closed")
     conn.close()
 
 def main():
-    global game 
+    global game, player
     while True:
         conn, addr = s.accept()
         print("Connected to: ", addr)
 
         if player == 0:
             game = index.Game()
-            print("Creating a new game...")
+            print("Player 1 connected")
+            player += 1
         else:
             game.bothConnected = True
             player = 1
+            print("Player 2 connected")
 
         start_new_thread(threaded_client, (conn, player))
 

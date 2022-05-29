@@ -4,9 +4,7 @@ import pygame
 import index
 import accueil
 import json
-import join_room
 import add_players
-import network
 
 
 backButton = index.Button("BACK",(0,0),80)

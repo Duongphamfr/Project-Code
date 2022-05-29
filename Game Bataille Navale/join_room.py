@@ -52,7 +52,6 @@ def main():
                                 print("Couldn't get game")
                                 break
 
-                            data["host"] = "False"
                             with open("players_data.json", "w") as f:
                                 f.write(str(data).replace("\'", "\""))
                             if game.bothConnected:

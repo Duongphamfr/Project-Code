@@ -1,4 +1,4 @@
-from copyreg import pickle
+import pickle
 import socket
 
 class Network:
@@ -6,12 +6,13 @@ class Network:
     def __init__(self, ip_addr = None):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if ip_addr == None:
-            self.hostname = socket.gethostname()
-            self.ip_addr = socket.gethostbyname((self.hostname))
+            # self.hostname = socket.gethostname()
+            # self.ip_addr = socket.gethostbyname((self.hostname))
+            self.ip_addr = socket.gethostbyname('localhost')
             self.host = str(self.ip_addr) # get IP address
         else:
             self.host = ip_addr
-        self.port = 5555
+        self.port = 9999
         self.addr = (self.host, self.port)
         self.id = self.connect()
 

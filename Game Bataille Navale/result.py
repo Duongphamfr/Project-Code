@@ -19,21 +19,24 @@ button3 = index.Button('QUIT',( 650, 700), 50)
 def main():
     running = True
 
-    n = battle.n
 
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
     
+    if data['mode'] == 'multi2':
+        n = battle.n
+
 
 
     while running:
-        try:
-            game = n.send("get")
-            data['winner'] = game.winner   
-        except:
-            running = False
-            print("Couldn't get game")
+        if data['mode'] == 'multi2':
+            try:
+                game = n.send("get")
+                data['winner'] = game.winner   
+            except:
+                running = False
+                print("Couldn't get game")
         
         winner = index.Text_box('The winner is ' + str(data['winner']), (300, 100), 50, index.BLACK)
 

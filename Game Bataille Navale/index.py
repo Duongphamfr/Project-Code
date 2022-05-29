@@ -422,12 +422,12 @@ class Game:
     def __init__(self):
         self.turn = 1
         self.bothConnected = False
-        self.p1Ready, self.p2Ready = False
-        self.name1, self.name2, self.size = ""
-        self.grid1, self.grid2 = NULL
-        self.winner = NULL
+        self.p1Ready, self.p2Ready = False, False
+        self.name1, self.name2, self.size = "", "", ""
+        self.grid1, self.grid2 = None, None 
+        self.winner = None
 
     def reset(self):
-        self.p1Ready, self.p2Ready = False
-        self.grid1, self.grid2 = NULL
-        self.winner = NULL
+        self.p1Ready, self.p2Ready = False, False
+        self.grid1, self.grid2 = None, None 
+        self.winner = None

@@ -21,17 +21,18 @@ def main():
         index.window.blit(index.bg_img, (0, 0))
         button1.draw()
         button2.draw()
+        button3.draw()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if button1.click(event):
-                data = {"mode": "mono", "host": "False"}
+                data = {"mode": "mono", "playerId": 'None'}
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
                 add_players.main()
             if button2.click(event):
-                data = {"mode": "multi1", "host": "False"}
+                data = {"mode": "multi1", "playerId": 'None'}
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
                 add_players.main()
