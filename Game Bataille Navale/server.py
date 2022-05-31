@@ -1,16 +1,16 @@
 import pickle
 import socket
 from _thread import *
-from turtle import update
 import index
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # use a socket to send and receive UDP data from an IPv4 address
 
 server = socket.gethostname()
 port = 9999
 
 server_ip = socket.gethostbyname('localhost')
 
+# wait for a connection
 try:
     s.bind((server_ip, port))
 except socket.error as e:
@@ -25,7 +25,6 @@ playerId = 0
 def threaded_client(conn, playerId):
     conn.send(str.encode(str(playerId)))
 
-    reply = ''
     while True:
         try:
             data = pickle.loads(conn.recv(100000))
@@ -50,11 +49,9 @@ def threaded_client(conn, playerId):
                         game.setTurn(1)
                     else:
                         game.setTurn(2)
-
-
-                elif isinstance(data, str) and data != "update":
+                elif isinstance(data, str) and data != "update": # this data means player's name
                     game.setName(playerId, data)
-                elif data != "update":
+                elif data != "update": # this data means the grid data (a list)
                     if not game.toggleGrid:
                         if playerId == 1:
                             game.setGrid(playerId, data)
@@ -65,8 +62,8 @@ def threaded_client(conn, playerId):
                             game.updateGrid2 = data
                         else:
                             game.updateGrid1 = data
-                            
-                conn.sendall(pickle.dumps(game))
+
+                conn.sendall(pickle.dumps(game)) # send back data to user
 
         except Exception as e:
             print(e)
@@ -85,6 +82,7 @@ def main():
 
         if playerId == 1:
             game = index.Game()
+            print("Created a new game")
             print("Player 1 connected")
         else:
             game.bothConnected = True

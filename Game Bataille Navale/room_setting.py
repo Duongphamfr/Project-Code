@@ -17,6 +17,7 @@ FPS = 60
 
 # menu game
 def main():
+    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)

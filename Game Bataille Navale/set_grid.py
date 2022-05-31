@@ -22,11 +22,12 @@ def main():
     listShip = data_map.listShip
     grid = index.Grid(data_map.gridSize, (200, 350), listShip)
 
-
+    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
 
+#################################### USER PLAY WITH COMPUTER ####################################
     if data['mode'] == 'mono':
         button1 = index.Button("Confirm grid", (100, 150), 30)
         button3 = index.Button("WAR", (100, 700), 30)
@@ -34,9 +35,7 @@ def main():
         running = True
 
         while running:
-            # get the number of target
             target = grid.countTarget()
-
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
             backButton.draw()
@@ -62,13 +61,14 @@ def main():
                         data['grid1'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
-                        grid.__init__(data_map.gridSize, (200, 350), listShip)
+                        grid.__init__(data_map.gridSize, (200, 350), listShip) # reset the listship
                         data_map.reset_listShip()
                         print("Saved Player 1")
                 if ('grid1' in data):
                     if button3.click(event):
                         battle.main()
 
+################################## TWO PLAYERS ON THE SAME COMPUTER ##################################
     elif data['mode'] == 'multi1':
         button1 = index.Button("Confirm grid of player 1", (100, 150), 30)
         button2 = index.Button("Confirm grid of player 2", (500, 150), 30)
@@ -77,9 +77,7 @@ def main():
         running = True
 
         while running:
-            # get the number of target
             target = grid.countTarget()
-
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
             backButton.draw()
@@ -120,7 +118,9 @@ def main():
                     if button3.click(event):
                         battle.main()
 
+############################ TWO PLAYERS ON TWO DIFFERENT COMPUTERS IN THE SAME LAN (LOCAL AREA NETWORK) ############################
     if data['mode'] == 'multi2':
+        # get the connection created before
         global n
         if data['playerId'] == '1' and data["replay"] == "False":
             n = create_room.n
@@ -143,9 +143,7 @@ def main():
                 print("Couldn't get game")
                 break
 
-            # get the number of target
             target = grid.countTarget()
-
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
             backButton.draw()
@@ -154,7 +152,6 @@ def main():
                 button1.draw()
             elif 'grid1' in data:
                 button2.draw()
-
             for ship in listShip:
                 ship.draw()
             pygame.display.update()

@@ -8,12 +8,10 @@ pygame.init()
 pygame.font.init()
 pygame.mixer.init()
 
-# set the screen system
-
+# set the display
 width, height = pyautogui.size()
 window = pygame.display.set_mode((width, height-80))
 pygame.display.set_caption("BATAILLE NAVIRE")
-
 bg_img = pygame.image.load("Assets/bg-accueil.jpg")
 bg_img = pygame.transform.scale(bg_img, (width, height-80))
 
@@ -27,10 +25,9 @@ BLUE = (0, 0, 255)
 COLOR_INACTIVE_BOX = WHITE
 COLOR_ACTIVE_BOX = RED
 
-# set the size of grid
+# set the grid size
 SIZE_GRID_SMALL = 7
 SIZE_GRID_MEDIUM = 10
-
 
 # create the textbox class
 class Text_box:
@@ -115,7 +112,7 @@ class Input_box:
                 self.user_text += event.unicode
             self.text_surface = self.font.render(self.user_text, True, BLACK)   
 
-
+# create the ship (the rectangle)
 class Ship:
     def __init__(self, size, pos):
         self.draging = False
@@ -129,7 +126,7 @@ class Ship:
         pygame.draw.rect(window, self.color, self.rect)
     
     def handle_event(self, event):
-        # drag and drop
+        # drag and drop event
         self.event = event
         mouse_x, mouse_y = pygame.mouse.get_pos()
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -146,7 +143,7 @@ class Ship:
                 mouse_x, mouse_y = event.pos
                 self.x = mouse_x + self.offset_x
                 self.y = mouse_y + self.offset_y
-        # rotate
+        # rotate event
         if event.type == pygame.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(mouse_x, mouse_y):
                 if event.button == 3:
@@ -155,14 +152,12 @@ class Ship:
                     self.size_y = a
 
 
-# button Square
-
+# create the square of grid (a special button)
 class Square(Ship):
     def __init__(self, size, pos, listShip, dataTarget):
         self.isChangeTurn = False
         self.listShip = listShip
         self.dataTarget = dataTarget
-        # self.confirmed = False
         if dataTarget == 0:
             self.isTarget = False
         elif dataTarget == 1:
@@ -173,7 +168,6 @@ class Square(Ship):
         self.color = BLACK
         self.x, self.y = pos
         self.size = size
-
         self.rect = pygame.Rect(self.x, self.y, self.size[0], self.size[1])
     
     def handle_event(self, event):
@@ -224,7 +218,6 @@ class Square(Ship):
         pygame.draw.rect(window, self.color, self.rect)
 
 # create the grid
-
 class Grid:
     def __init__(self, size, pos, listShip=[], getData=False):
         self.turnAttacked = False
@@ -305,8 +298,6 @@ class Grid:
                 else:
                     i.color = WHITE
             k += 1
-
-
 
     def save(self):
         dataGrid = []
@@ -437,6 +428,7 @@ def shipDataRandom(sizeShip, amount, sizeGrid):
                     listTargetChose.append((i, xShip))
                 ship_Added += 1
 
+# class Game to handle data in mode MULTI2
 class Game:
     def __init__(self):
         self.turn = 1

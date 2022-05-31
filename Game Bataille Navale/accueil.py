@@ -4,7 +4,6 @@ import index
 import add_players
 import room_setting
 
-# create the button
 button1 = index.Button("Mono-player", (300, 300), 100)
 button2 = index.Button("Multi-player 1 PC", (300, 500), 100)
 button3 = index.Button("Multi-player 2 PC", (300, 700), 100)
@@ -13,7 +12,6 @@ button3 = index.Button("Multi-player 2 PC", (300, 700), 100)
 clock = pygame.time.Clock()
 FPS = 60
 
-#menu game
 def main():
     running = True
     while running:

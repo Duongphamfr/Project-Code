@@ -6,7 +6,6 @@ import choose_size
 import json
 import join_room
 
-
 backButton = index.Button("BACK",(0,0),80)
 textGuide = index.Text_box("Fill your name and press Enter to continue", (100, 600), 50, index.BLACK)
 
@@ -15,6 +14,7 @@ clock = pygame.time.Clock()
 FPS = 60
 
 def main():
+    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
@@ -22,6 +22,7 @@ def main():
     if data['mode'] == 'mono' or data['mode'] == 'multi2':
         input1 = index.Input_box((600,100),(650,300))
         text1 = index.Text_box("Player's Name", (650, 250), 80, index.BLACK)
+
         running = True
         while running:
             clock.tick(FPS)
@@ -30,7 +31,6 @@ def main():
             input1.draw()
             text1.draw()
             textGuide.draw()
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -51,8 +51,6 @@ def main():
                                 with open("players_data.json", "w") as f:
                                     f.write(str(data).replace("\'", "\""))
                                 join_room.main()
-
-
             pygame.display.update()
     
     elif data['mode'] == 'multi1':
@@ -70,7 +68,6 @@ def main():
             text1.draw()
             text2.draw()
             textGuide.draw()
-
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()

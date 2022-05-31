@@ -17,6 +17,7 @@ clock = pygame.time.Clock()
 FPS = 60
 
 def main():
+    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
@@ -42,7 +43,7 @@ def main():
                         if event.key == pygame.K_RETURN:
                             data["roomID"] = input1.user_text
                             global n
-                            n = network.Network(input1.user_text)
+                            n = network.Network(input1.user_text) # create a connection to server
                             try:
                                 game = n.send(data["name2"])
                                 data['name1'] = game.name1

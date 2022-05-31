@@ -13,7 +13,6 @@ clock = pygame.time.Clock()
 FPS = 60
 
 def main():
-
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
@@ -25,6 +24,7 @@ def main():
     
     turn = data['name1']
 
+#################################### USER PLAY WITH COMPUTER ####################################
     if data['mode'] == 'mono':
         grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
         gridAuto = index.Grid(gridSize, (1200, 300), getData="Random")
@@ -45,10 +45,8 @@ def main():
             nameAuto.draw()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             targetAuto = index.Text_box("Target Alive: " + str(gridAuto.countTargetAlive()), (1200, 800), 50, index.BLACK)
-
             target1.draw()
             targetAuto.draw()
-
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -57,11 +55,10 @@ def main():
                 if quitButton.click(event):
                     accueil.main()
                 if turn == data['name1']:
-                    # draw text turn
                     grid1.resetTurn()
-                    grid1.offAttacked()
-                    gridAuto.onAttacked()
-                    gridAuto.attacked(event)
+                    grid1.offAttacked() # denie the click event
+                    gridAuto.onAttacked() # allow user to attack
+                    gridAuto.attacked(event) # get the click event
                     if gridAuto.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name1']
@@ -71,9 +68,9 @@ def main():
                         turn = "Computer"
                 if turn == "Computer":
                     gridAuto.resetTurn()
-                    gridAuto.offAttacked()
-                    grid1.onAttacked()
-                    grid1.randomAttacked()
+                    gridAuto.offAttacked() # denie the click event
+                    grid1.onAttacked() #allow user to attack
+                    grid1.randomAttacked() # random a square (target) to attack
                     grid1.attacked(event)
                     if grid1.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
@@ -83,6 +80,7 @@ def main():
                     if grid1.changeTurn():
                         turn = data['name1']
 
+################################## TWO PLAYERS ON THE SAME COMPUTER ##################################
     elif data['mode'] == 'multi1':
 
         grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
@@ -103,10 +101,8 @@ def main():
             name2.draw()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
-
             target1.draw()
             target2.draw()
-
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -116,9 +112,9 @@ def main():
                     accueil.main()
                 if turn == data['name1']:
                     grid1.resetTurn()
-                    grid1.offAttacked()
-                    grid2.onAttacked()
-                    grid2.attacked(event)
+                    grid1.offAttacked() # denie the click event
+                    grid2.onAttacked() # allow user to attack
+                    grid2.attacked(event) # get the click event
                     if grid2.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name1']
@@ -128,9 +124,9 @@ def main():
                         turn = data['name2']
                 if turn == data['name2']:
                     grid2.resetTurn()
-                    grid2.offAttacked()
-                    grid1.onAttacked()
-                    grid1.attacked(event)
+                    grid2.offAttacked() # denie the click event
+                    grid1.onAttacked() # allow user to attack
+                    grid1.attacked(event) # get the click event
                     if grid1.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name2']
@@ -139,26 +135,29 @@ def main():
                     if grid1.changeTurn():
                         turn = data['name1']
 
+############################ TWO PLAYERS ON TWO DIFFERENT COMPUTERS IN THE SAME LAN (LOCAL AREA NETWORK) ############################
     elif data['mode'] == 'multi2':
         running = False
-        global n
-        n = set_grid.n
+        global n 
+        n = set_grid.n # get the connection created before
+        # send the grid data to server
         try:
             if data["playerId"] == "1":
                 grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
-                dataGrid1 = grid1.save()
+                dataGrid1 = grid1.save() # get the grid data (a list of of "0" and "1")
                 game = n.send(dataGrid1)
-                game = n.send("pushed grid")
+                game = n.send("pushed grid") # inform if the player had sent the grid data
             else:
                 grid2 = index.Grid(gridSize, (1200, 300), getData="Player1")
-                dataGrid2 = grid2.save()
+                dataGrid2 = grid2.save() # get the grid data (a list of of "0" and "1")
                 game = n.send(dataGrid2)
-                game = n.send("pushed grid")
+                game = n.send("pushed grid") # inform if the player had sent the grid data
         except Exception as e:
             running = False
             print(e)
             print("Couldn't get game")
 
+        # if the both player had sent grid data to server, the both synchronize data and change the mode of sending data (from sending their own grid data to sending the grid data of the rival)
         if game.p1PushGrid and game.p2PushGrid:
             grid1 = game.grid1
             grid2 = game.grid2
@@ -177,19 +176,20 @@ def main():
             grid1.draw()
             grid2.draw()
 
+            # send data of the rival to server for updating the grid
             if data["playerId"] == "1":
                 updateGrid2 = grid2.dataAttacked()
                 game = n.send(updateGrid2)
-                grid1.updateSquare(game.updateGrid1)
+                grid1.updateSquare(game.updateGrid1) # update the squares which had been attacked
             elif data["playerId"] == "2":
                 updateGrid1 = grid1.dataAttacked()
                 game = n.send(updateGrid1)
-                grid2.updateSquare(game.updateGrid2)
+                grid2.updateSquare(game.updateGrid2) # update the squares which had been attacked
+
             name1.draw()
             name2.draw()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
-
             target1.draw()
             target2.draw()
 
@@ -202,30 +202,30 @@ def main():
                     accueil.main()
                 if game.turn == 1:
                     grid1.resetTurn()
-                    grid1.offAttacked()
+                    grid1.offAttacked() # denie the click (attack action)
                     if data["playerId"] == "1":
-                        grid2.onAttacked()
-                        grid2.attacked(event)
+                        grid2.onAttacked() # allow player 1 to attack
+                        grid2.attacked(event) # get the attack event
                         if grid2.changeTurn():
                             game = n.send("turn 2")
                 if game.turn == 2:
                     grid2.resetTurn()
-                    grid2.offAttacked()
+                    grid2.offAttacked() # denie the click (attack action)
                     if data['playerId'] == '2':
-                        grid1.onAttacked()
-                        grid1.attacked(event)
+                        grid1.onAttacked() # allow player 2 to attack
+                        grid1.attacked(event) # get the attack event
                         if grid1.changeTurn():
                             game = n.send("turn 1")
             if grid2.countTargetAlive() == 0:
                 if data["playerId"] == "1":
-                    game = n.send("1")
+                    game = n.send("1") # send the winnner ID to server
                     updateGrid2 = grid2.dataAttacked()
-                    game = n.send(updateGrid2)
+                    game = n.send(updateGrid2) # send the grid data before finish the battle
                 result.main()
             if grid1.countTargetAlive() == 0:
                 if data["playerId"] == "2":
-                    game = n.send("2")
+                    game = n.send("2") # send the winnner ID to server
                     updateGrid1 = grid1.dataAttacked()
-                    game = n.send(updateGrid1)
+                    game = n.send(updateGrid1) # send the grid data before finish the battle
                 result.main()
 

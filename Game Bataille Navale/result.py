@@ -18,15 +18,14 @@ button3 = index.Button('QUIT',( 650, 700), 50)
 
 def main():
     running = True
-
-
+    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
     
     if data['mode'] == 'multi2':
         global n
-        n = battle.n
+        n = battle.n # get the connection created before
 
     if data['mode'] == 'multi2':
         try:
@@ -55,6 +54,7 @@ def main():
             if button1.click(event):
                 accueil.main()
             if button2.click(event):
+                # remove the old data to replay a new game
                 if data['mode'] == 'mono':
                     data.pop('winner')
                     data.pop('grid1')
