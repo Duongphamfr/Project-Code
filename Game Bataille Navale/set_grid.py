@@ -18,32 +18,42 @@ FPS = 60
 def main():
     import data_map
     reload(data_map)
-
     listShip = data_map.listShip
     grid = index.Grid(data_map.gridSize, (200, 350), listShip)
 
-    # get data stocked in a json file
+
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
 
-#################################### USER PLAY WITH COMPUTER ####################################
     if data['mode'] == 'mono':
-        button1 = index.Button("Confirm grid", (100, 150), 30)
-        button3 = index.Button("WAR", (100, 700), 30)
-
+        button1 = index.Button("Confirm grid", (100, 300), 30)
+        button3 = index.Button("WAR", (100, 300), 50)
+        guide_1 = index.Text_box(" click RIGHT mouse to change the ships' direction", (650, 130), 50, index.BLACK)
+        guide_2 = index.Text_box("1. Drag and drop the ships in the map,", (650,90), 50, index.BLACK)
+        guide_3 = index.Text_box("2. Click confirm when ships are all set", (650,180), 50, index.BLACK)
         running = True
+        chifoumi_single = index.chifoumi_game()
 
         while running:
+            # get the number of target
             target = grid.countTarget()
+
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
             backButton.draw()
             grid.draw()
+            index.window.blit(index.wood_img, (630,50))
+            
             if ('grid1' not in data):
                 button1.draw()
+                guide_1.draw()
+                guide_2.draw()
+                guide_3.draw()
+                chifoumi_single.draw()
             if ('grid1' in data):
                 button3.draw()
+                chifoumi_single.print_result_COM()
             for ship in listShip:
                 ship.draw()
             pygame.display.update()
@@ -52,72 +62,97 @@ def main():
                     pygame.quit()
                     sys.exit()
                 grid.handle_event(event)
-                if backButton.click(event):
+                if backButton.click(): 
                     choose_size.main()
                 for ship in listShip:
                     ship.handle_event(event)
-                if ('grid1' not in data) and (target == data_map.totalTarget):
-                    if button1.click(event):
-                        data['grid1'] = grid.save()
-                        with open("players_data.json", "w") as f:
-                            f.write(str(data).replace("\'", "\""))
-                        grid.__init__(data_map.gridSize, (200, 350), listShip) # reset the listship
-                        data_map.reset_listShip()
-                        print("Saved Player 1")
-                if ('grid1' in data):
-                    if button3.click(event):
-                        battle.main()
-
-################################## TWO PLAYERS ON THE SAME COMPUTER ##################################
-    elif data['mode'] == 'multi1':
-        button1 = index.Button("Confirm grid of player 1", (100, 150), 30)
-        button2 = index.Button("Confirm grid of player 2", (500, 150), 30)
-        button3 = index.Button("WAR", (100, 700), 30)
-
-        running = True
-
-        while running:
-            target = grid.countTarget()
-            clock.tick(FPS)
-            index.window.blit(index.bg_img, (0, 0))
-            backButton.draw()
-            grid.draw()
-            if ('grid1' not in data):
-                button1.draw()
-            if ('grid2' not in data):
-                button2.draw()
-            if ('grid1' in data) and ('grid2' in data):
-                button3.draw()
-            for ship in listShip:
-                ship.draw()
-            pygame.display.update()
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
-                grid.handle_event(event)
-                if backButton.click(event):
-                    choose_size.main()
-                for ship in listShip:
-                    ship.handle_event(event)
-                if ('grid1' not in data) and (target == data_map.totalTarget):
-                    if button1.click(event):
+                if ('grid1' not in data) and (target == data_map.totalTarget) and chifoumi_single.choice_player != "null":
+                    if button1.click():
                         data['grid1'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
                         grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
-                if ('grid2' not in data) and (target == data_map.totalTarget):
-                    if button2.click(event):
+                        print("Saved Player 1")
+                if ('grid1' in data):
+                    if button3.click():
+                        battle.main()
+                if chifoumi_single.choose(event) != 0:
+                    chifoumi_single.play_COM()
+            chifoumi_single.chifoumi(chifoumi_single.choice_player, chifoumi_single.choice_COM)
+            
+
+    elif data['mode'] == 'multi':
+        button1 = index.Button("Confirm grid of player 1", (100, 300), 30)
+        button2 = index.Button("Confirm grid of player 2", (500, 300), 30)
+        button3 = index.Button("WAR", (100, 300), 50)
+        guide_1 = index.Text_box(" click RIGHT mouse to change the ships' direction", (650, 130), 50, index.BLACK)
+        guide_2 = index.Text_box("1. Drag and drop the ships in the map,", (650,90), 50, index.BLACK)
+        guide_3 = index.Text_box("2. Click confirm when ships are all set", (650,180), 50, index.BLACK)
+        
+        running = True
+        chifoumi_multi = index.chifoumi_game()
+        while running:
+            # get the number of target
+            target = grid.countTarget()
+
+            clock.tick(FPS)
+            index.window.blit(index.bg_img, (0, 0))
+            backButton.draw()
+            grid.draw()
+            index.window.blit(index.wood_img, (630,50))
+            if ('grid1' not in data):
+                button1.draw()
+                guide_1.draw()
+                guide_2.draw()
+                guide_3.draw()
+                chifoumi_multi.draw()
+            if ('grid2' not in data):
+                button2.draw()
+                guide_1.draw()
+                guide_2.draw()
+                guide_3.draw()
+                chifoumi_multi.draw()
+            if ('grid1' in data) and ('grid2' in data):
+                button3.draw()
+                chifoumi_multi.print_result_player()
+            for ship in listShip:
+                ship.draw()
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                grid.handle_event(event)
+                if backButton.click():  
+                    choose_size.main()
+                for ship in listShip:
+                    ship.handle_event(event)
+                if ('grid1' not in data) and (target == data_map.totalTarget) and chifoumi_multi.choice_player_1 != "null":
+                    if button1.click():    
+                        data['grid1'] = grid.save()
+                        with open("players_data.json", "w") as f:
+                            f.write(str(data).replace("\'", "\""))
+                        grid.__init__(data_map.gridSize, (200, 350), listShip)
+                        data_map.reset_listShip()
+                        chifoumi_multi.reset_choice()
+                if ('grid2' not in data) and (target == data_map.totalTarget) and chifoumi_multi.choice_player_2 != "null":
+                    if button2.click(): 
                         data['grid2'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))
                         grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
+                        chifoumi_multi.reset_choice()
                 if ('grid1' in data) and ('grid2' in data):
-                    if button3.click(event):
-                        battle.main()
-
+                    if button3.click(): 
+                        battle.main()   
+                if chifoumi_multi.choose(event) != 0 and ('grid1' not in data):
+                    chifoumi_multi.play_1()
+                if chifoumi_multi.choose(event) != 0 and ('grid2' not in data):
+                    chifoumi_multi.play_2()
+            chifoumi_multi.chifoumi(chifoumi_multi.choice_player_1,chifoumi_multi.choice_player_2)
+            
 ############################ TWO PLAYERS ON TWO DIFFERENT COMPUTERS IN THE SAME LAN (LOCAL AREA NETWORK) ############################
     if data['mode'] == 'multi2':
         # get the connection created before
@@ -160,12 +195,12 @@ def main():
                     pygame.quit()
                     sys.exit()
                 grid.handle_event(event)
-                if backButton.click(event):
+                if backButton.click():
                     choose_size.main()
                 for ship in listShip:
                     ship.handle_event(event)
                 if ('grid1' not in data) and (target == data_map.totalTarget):
-                    if button1.click(event):
+                    if button1.click():
                         data['grid1'] = grid.save()
                         with open("players_data.json", "w") as f:
                             f.write(str(data).replace("\'", "\""))

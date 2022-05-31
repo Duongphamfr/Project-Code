@@ -7,8 +7,6 @@ import set_grid
 import network
 
 
-
-
 # setting for the infinity loop
 clock = pygame.time.Clock()
 FPS = 60
@@ -45,7 +43,6 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if backButton.click(event):
+            if backButton.click():
                 add_players.main()
         pygame.display.update()
-

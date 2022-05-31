@@ -35,7 +35,7 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if backButton.click(event):
+                if backButton.click():
                     add_players.main()
                 input1.handle_event(event)
                 if len(input1.user_text) != 0:

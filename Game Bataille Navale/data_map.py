@@ -1,7 +1,6 @@
 import index
 import json
 
-# get data stocked in a json file
 with open("players_data.json", "r") as f:
     data = f.read()
     data = json.loads(data)
@@ -9,11 +8,16 @@ with open("players_data.json", "r") as f:
 if data['size'] == 'medium':
     gridSize = 10
     totalTarget = 16
+    # MEDIUM SIZE
 
     # create the Ship
+
+    # big Ship
     ship1 = index.Ship((35, 195), (1000, 300))
+    # medium ship
     ship2 = index.Ship((35, 120), (1100, 300))
     ship3 = index.Ship((35, 120), (1200, 300))
+    # small ship
     ship4 = index.Ship((35, 35), (1300, 300))
     ship5 = index.Ship((35, 35), (1300, 350))
     ship6 = index.Ship((35, 35), (1300, 400))
@@ -37,9 +41,13 @@ if data['size'] == 'medium':
 elif data['size'] == 'small':
     gridSize = 7
     totalTarget = 8
+    # SMALL SIZE
 
     # create the Ship
+
+    # medium Ship
     ship1 = index.Ship((35, 120), (1000, 300))
+    # small ship
     ship2 = index.Ship((35, 35), (1100, 300))
     ship3 = index.Ship((35, 35), (1200, 350))
     ship4 = index.Ship((35, 35), (1300, 400))

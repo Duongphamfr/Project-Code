@@ -6,6 +6,7 @@ import choose_size
 import json
 import join_room
 
+
 backButton = index.Button("BACK",(0,0),80)
 textGuide = index.Text_box("Fill your name and press Enter to continue", (100, 600), 50, index.BLACK)
 
@@ -14,15 +15,13 @@ clock = pygame.time.Clock()
 FPS = 60
 
 def main():
-    # get data stocked in a json file
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
 
-    if data['mode'] == 'mono' or data['mode'] == 'multi2':
+    if data['mode'] == 'mono' or data['mode'] =='multi2':
         input1 = index.Input_box((600,100),(650,300))
-        text1 = index.Text_box("Player's Name", (650, 250), 80, index.BLACK)
-
+        text1 = index.Text_box("Player's Name", (650, 200), 80, index.BLACK )       
         running = True
         while running:
             clock.tick(FPS)
@@ -35,7 +34,7 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if backButton.click(event):
+                if backButton.click():
                     accueil.main()
                 input1.handle_event(event)
                 if len(input1.user_text) != 0:
@@ -53,11 +52,11 @@ def main():
                                 join_room.main()
             pygame.display.update()
     
-    elif data['mode'] == 'multi1':
+    elif data['mode'] == 'multi':
         input1 = index.Input_box((600,100),(300,300))
         input2 = index.Input_box((600,100),(1000,300))
-        text1 = index.Text_box("Name of Player 1", (300, 250), 80, index.BLACK)
-        text2 = index.Text_box("Name of Player 2", (1000, 250), 80, index.BLACK)
+        text1 = index.Text_box("Name of Player 1", (300, 200), 80, index.BLACK)    
+        text2 = index.Text_box("Name of Player 2", (1000, 200), 80, index.BLACK)    
         running = True
         while running:
             clock.tick(FPS)
@@ -68,12 +67,11 @@ def main():
             text1.draw()
             text2.draw()
             textGuide.draw()
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if backButton.click(event):
-                    accueil.main()
                 input1.handle_event(event)
                 input2.handle_event(event)
                 if (len(input1.user_text) != 0) and (len(input2.user_text) != 0):
@@ -84,5 +82,7 @@ def main():
                             with open("players_data.json", "w") as f:
                                 f.write(str(data).replace("\'", "\""))
                             choose_size.main()
+            if backButton.click():          
+                    accueil.main()
             pygame.display.update()
 

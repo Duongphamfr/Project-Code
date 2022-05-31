@@ -6,13 +6,14 @@ import result
 import accueil
 import set_grid
 
-quitButton = index.Button("QUIT", (1500, 0), 50)
+quitButton = index.Button("QUIT", (1400, 0), 50)
 
 # setting for the infinity loop
 clock = pygame.time.Clock()
 FPS = 60
 
 def main():
+
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
@@ -22,7 +23,10 @@ def main():
     elif data['size'] == 'medium':
         gridSize = 10
     
-    turn = data['name1']
+    if data['mode'] == 'multi2':
+        turn = data['name1']
+    else:
+        turn = data['chifoumi']
 
 #################################### USER PLAY WITH COMPUTER ####################################
     if data['mode'] == 'mono':
@@ -41,24 +45,29 @@ def main():
             gridAuto.draw()
             turnText = index.Text_box("Turn of: " + turn, (700, 100), 50, index.BLACK)
             turnText.draw()
+            # draw text name player
             name1.draw()
             nameAuto.draw()
-            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
-            targetAuto = index.Text_box("Target Alive: " + str(gridAuto.countTargetAlive()), (1200, 800), 50, index.BLACK)
+            # draw text the number target remain grid.countTargetAlive()
+            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 700), 50, index.BLACK)
+            targetAuto = index.Text_box("Target Alive: " + str(gridAuto.countTargetAlive()), (1200, 700), 50, index.BLACK)
+
             target1.draw()
             targetAuto.draw()
+
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if quitButton.click(event):
+                if quitButton.click():
                     accueil.main()
                 if turn == data['name1']:
+                    # draw text turn
                     grid1.resetTurn()
-                    grid1.offAttacked() # denie the click event
-                    gridAuto.onAttacked() # allow user to attack
-                    gridAuto.attacked(event) # get the click event
+                    grid1.offAttacked()
+                    gridAuto.onAttacked()
+                    gridAuto.attacked(event)
                     if gridAuto.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name1']
@@ -67,10 +76,11 @@ def main():
                     if gridAuto.changeTurn():
                         turn = "Computer"
                 if turn == "Computer":
+                    # draw text turn
                     gridAuto.resetTurn()
-                    gridAuto.offAttacked() # denie the click event
-                    grid1.onAttacked() #allow user to attack
-                    grid1.randomAttacked() # random a square (target) to attack
+                    gridAuto.offAttacked()
+                    grid1.onAttacked()
+                    grid1.randomAttacked()
                     grid1.attacked(event)
                     if grid1.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
@@ -81,12 +91,14 @@ def main():
                         turn = data['name1']
 
 ################################## TWO PLAYERS ON THE SAME COMPUTER ##################################
-    elif data['mode'] == 'multi1':
+    elif data['mode'] == 'multi':
 
         grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
         grid2 = index.Grid(gridSize, (1200, 300), getData="Player2")
         name1 = index.Text_box("Grid of " + data['name1'], (200, 150), 50, index.BLACK)
         name2 = index.Text_box("Grid of " + data['name2'], (1200, 150), 50, index.BLACK)
+
+
 
         running = True
         while running:
@@ -97,24 +109,29 @@ def main():
             turnText.draw()
             grid1.draw()
             grid2.draw()
+            # draw text name player
             name1.draw()
             name2.draw()
-            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
-            target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
+            # draw text the number target remain grid.countTargetAlive()
+            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 700), 50, index.BLACK)
+            target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 700), 50, index.BLACK)
+
             target1.draw()
             target2.draw()
+
             pygame.display.update()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if quitButton.click(event):
+                if quitButton.click():
                     accueil.main()
                 if turn == data['name1']:
+                    # draw text turn
                     grid1.resetTurn()
-                    grid1.offAttacked() # denie the click event
-                    grid2.onAttacked() # allow user to attack
-                    grid2.attacked(event) # get the click event
+                    grid1.offAttacked()
+                    grid2.onAttacked()
+                    grid2.attacked(event)
                     if grid2.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name1']
@@ -123,10 +140,11 @@ def main():
                     if grid2.changeTurn():
                         turn = data['name2']
                 if turn == data['name2']:
+                    # draw text turn
                     grid2.resetTurn()
-                    grid2.offAttacked() # denie the click event
-                    grid1.onAttacked() # allow user to attack
-                    grid1.attacked(event) # get the click event
+                    grid2.offAttacked()
+                    grid1.onAttacked()
+                    grid1.attacked(event)
                     if grid1.countTargetAlive() == 0:
                         with open("players_data.json", "w") as f:
                             data['winner'] = data['name2']
@@ -134,8 +152,7 @@ def main():
                         result.main()
                     if grid1.changeTurn():
                         turn = data['name1']
-
-############################ TWO PLAYERS ON TWO DIFFERENT COMPUTERS IN THE SAME LAN (LOCAL AREA NETWORK) ############################
+######################### TWO PLAYERS ON TWO DIFFERENT COMPUTERS IN THE SAME LAN (LOCAL AREA NETWORK) ############################
     elif data['mode'] == 'multi2':
         running = False
         global n 
@@ -188,8 +205,8 @@ def main():
 
             name1.draw()
             name2.draw()
-            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
-            target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
+            target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 700), 50, index.BLACK)
+            target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 700), 50, index.BLACK)
             target1.draw()
             target2.draw()
 
@@ -198,7 +215,7 @@ def main():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if quitButton.click(event):
+                if quitButton.click():
                     accueil.main()
                 if game.turn == 1:
                     grid1.resetTurn()
@@ -228,4 +245,3 @@ def main():
                     updateGrid1 = grid1.dataAttacked()
                     game = n.send(updateGrid1) # send the grid data before finish the battle
                 result.main()
-

@@ -6,9 +6,8 @@ import index
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) # use a socket to send and receive UDP data from an IPv4 address
 
 server = socket.gethostname()
+server_ip = socket.gethostbyname(server)
 port = 9999
-
-server_ip = socket.gethostbyname('localhost')
 
 # wait for a connection
 try:

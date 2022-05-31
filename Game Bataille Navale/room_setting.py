@@ -33,14 +33,14 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if backButton.click(event):
+            if backButton.click():
                 accueil.main()
-            if button1.click(event):
+            if button1.click():
                 data["playerId"] = '1'
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
                 add_players.main()
-            if button2.click(event):
+            if button2.click():
                 data["playerId"] = '2'
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
@@ -48,4 +48,3 @@ def main():
 
         pygame.display.update()
     
-
