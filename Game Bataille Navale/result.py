@@ -25,18 +25,20 @@ def main():
         data = json.loads(data)
     
     if data['mode'] == 'multi2':
+        global n
         n = battle.n
 
+    if data['mode'] == 'multi2':
+        try:
+            game = n.send("update")
+            data['winner'] = game.winner   
+        except Exception as e:
+            print(e)
+            print("Couldn't get game")
+            running = False
 
 
     while running:
-        if data['mode'] == 'multi2':
-            try:
-                game = n.send("get")
-                data['winner'] = game.winner   
-            except:
-                running = False
-                print("Couldn't get game")
         
         winner = index.Text_box('The winner is ' + str(data['winner']), (300, 100), 50, index.BLACK)
 
@@ -65,7 +67,9 @@ def main():
                 if data['mode'] == 'multi2':
                     data.pop('winner')
                     data.pop('grid1')
-                    data.pop('grid2')
+                    data["replay"] = "True"
+                    with open("players_data.json", "w") as f:
+                        f.write(str(data).replace("\'", "\""))
                     game = n.send('reset')
                     set_grid.main()
 

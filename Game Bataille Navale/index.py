@@ -247,6 +247,8 @@ class Grid:
                 data = f.read()
                 data = json.loads(data)
             self.dataTarget = data['grid2']
+        elif isinstance(self.getData, list):
+            self.dataTarget = self.getData
 
         self.x, self.y = pos
         self.blockSize = 35
@@ -283,6 +285,28 @@ class Grid:
         self.event = event
         for i in self.listSquare:
             i.attacked(self.event)
+
+    def dataAttacked(self):
+        dataAttacked = []
+        for i in self.listSquare:
+            if i.isAttacked:
+                dataAttacked.append(1)
+            else:
+                dataAttacked.append(0)
+        return dataAttacked
+    
+    def updateSquare(self, list):
+        k = 0
+        for i in self.listSquare:
+            if list[k] == 1:
+                i.isAttacked = True
+                if i.isTarget:
+                    i.color = BLUE
+                else:
+                    i.color = WHITE
+            k += 1
+
+
 
     def save(self):
         dataGrid = []
@@ -327,12 +351,11 @@ class Grid:
             if i.isChangeTurn:
                 self.isChangeTurn = True
         return self.isChangeTurn
-    
+
     def resetTurn(self):
         for i in self.listSquare:
             i.isChangeTurn = False
 
-##################################################################################
 shipL = 5
 shipM = 3
 shipS = 1
@@ -414,20 +437,82 @@ def shipDataRandom(sizeShip, amount, sizeGrid):
                     listTargetChose.append((i, xShip))
                 ship_Added += 1
 
-
-
-
-##########################################################################
 class Game:
     def __init__(self):
         self.turn = 1
         self.bothConnected = False
         self.p1Ready, self.p2Ready = False, False
-        self.name1, self.name2, self.size = "", "", ""
-        self.grid1, self.grid2 = None, None 
+        self.toggleGrid = False
+        self.p1PushGrid = False
+        self.p2PushGrid = False
+        self.updateGrid1, self.updateGrid2 = [], []
         self.winner = None
+        self.reseted = False
+    
+    def setName(self, playerId, name):
+        if playerId == 1:
+            self.name1 = name
+        elif playerId == 2:
+            self.name2 = name
+    
+    def setSize(self, size):
+        self.size = size
+        if size == 'small':
+            self.sizeGrid = 7
+        elif size == 'medium':
+            self.sizeGrid = 10
+        for i in range(self.sizeGrid*self.sizeGrid):
+            self.updateGrid1.append(0)
+            self.updateGrid2.append(0)
 
+    
+    def setGrid(self, playerId, list):
+        with open("players_data.json", "r") as f:
+            data = f.read()
+            data = json.loads(data)
+
+        if data['size'] == 'small':
+            gridSize = 7
+        elif data['size'] == 'medium':
+            gridSize = 10
+
+        if playerId == 1:
+            self.grid1 = Grid(gridSize, (200, 300), getData=list)
+        elif playerId == 2:
+            self.grid2 = Grid(gridSize, (1200, 300), getData=list)    
+    
+    def setReady(self, playerId):
+        if playerId == 1:
+            self.p1Ready = True
+        else:
+            self.p2Ready = True
+    
+    def setPushGrid(self, playerId):
+        if playerId == 1:
+            self.p1PushGrid = True
+        else:
+            self.p2PushGrid = True
+    
+    def setTurn(self, playerId):
+        self.turn = playerId
+    
+    def setWinner(self, winner):
+        if winner == 1:
+            self.winner = self.name1
+        else:
+            self.winner = self.name2
+        self.reseted = False
+    
     def reset(self):
-        self.p1Ready, self.p2Ready = False, False
-        self.grid1, self.grid2 = None, None 
-        self.winner = None
+        if not self.reseted:
+            self.p1Ready, self.p2Ready = False, False
+            self.grid1, self.grid2 = None, None 
+            self.winner = None
+            self.turn = 1
+            self.toggleGrid = False
+            self.p1PushGrid = False
+            self.p2PushGrid = False
+            for i in self.updateGrid1:
+                self.updateGrid1[i] = 0
+                self.updateGrid2[i] = 0
+            self.reseted = True

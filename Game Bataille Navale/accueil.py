@@ -37,7 +37,7 @@ def main():
                     f.write(str(data).replace("\'", "\""))
                 add_players.main()
             if button3.click(event):
-                data = {"mode": "multi2"}
+                data = {"mode": "multi2", "replay": "False"}
                 with open("players_data.json", "w") as f:
                     f.write(str(data).replace("\'", "\""))
                 room_setting.main()

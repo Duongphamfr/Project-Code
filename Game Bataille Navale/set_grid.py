@@ -7,6 +7,7 @@ import choose_size
 from importlib import reload
 import create_room
 import join_room
+import result
 
 backButton = index.Button("BACK",(0,0),80)
 
@@ -120,23 +121,25 @@ def main():
                         battle.main()
 
     if data['mode'] == 'multi2':
-        if data['playerId'] == '1':
+        global n
+        if data['playerId'] == '1' and data["replay"] == "False":
             n = create_room.n
-        elif data['playerId'] == '2':
-            n = join_room.n 
-
+        elif data['playerId'] == '2' and data["replay"] == "False":
+            n = join_room.n
+        else:
+            n = result.n
 
         button1 = index.Button("Confirm grid", (100, 150), 30)
         button2 = index.Button("Waiting for player 2", (100, 250), 30)
-
 
         running = True
 
         while running:
             try:
-                game = n.send("get")
-            except:
+                game = n.send("update")
+            except Exception as e:
                 running = False
+                print(e)
                 print("Couldn't get game")
                 break
 
@@ -149,7 +152,7 @@ def main():
             grid.draw()
             if 'grid1' not in data:
                 button1.draw()
-            if 'grid1' in data:
+            elif 'grid1' in data:
                 button2.draw()
 
             for ship in listShip:
@@ -171,11 +174,6 @@ def main():
                             f.write(str(data).replace("\'", "\""))
                         grid.__init__(data_map.gridSize, (200, 350), listShip)
                         data_map.reset_listShip()
-                        print("Saved Player Grid")
-                        if data['playerId'] == '1':
-                            game.p1Ready = True
-                        else:
-                            game.p2Ready = True
+                        game = n.send("ready")
             if (game.p1Ready) and (game.p2Ready):
-                game = n.send("get")
                 battle.main()

@@ -15,6 +15,7 @@ FPS = 60
 
 #menu game
 def main():
+    global n
     n = network.Network()  # ket noi server
 
     # create the button
@@ -28,20 +29,15 @@ def main():
     with open("players_data.json", "r") as f:
         data = f.read()
         data = json.loads(data)
+    
+    game = n.send(data["size"])
+    game = n.send(data["name1"])
+    # print(game.name1)
+
 
     running = True
     while running:
-        try:
-            # game = n.send("get")
-            # n = network.Network()
-            game = n.send("get")
-            game.name1 = data["name1"]
-            game.size = data["size"]
-        except Exception as e:
-            print(e)
-            running = False
-            print("Couldn't get game")
-            break
+        game = n.send("update")
 
         clock.tick(FPS)
         index.window.blit(index.bg_img, (0, 0))

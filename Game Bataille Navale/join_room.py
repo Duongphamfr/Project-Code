@@ -41,10 +41,10 @@ def main():
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_RETURN:
                             data["roomID"] = input1.user_text
+                            global n
                             n = network.Network(input1.user_text)
                             try:
-                                game = n.send("get")
-                                game.name2 = data["name2"]
+                                game = n.send(data["name2"])
                                 data['name1'] = game.name1
                                 data['size'] = game.size
                             except:
@@ -55,6 +55,5 @@ def main():
                             with open("players_data.json", "w") as f:
                                 f.write(str(data).replace("\'", "\""))
                             if game.bothConnected:
-                                game = n.send("get")
                                 set_grid.main()
             pygame.display.update()

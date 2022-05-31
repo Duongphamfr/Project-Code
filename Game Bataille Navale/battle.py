@@ -41,10 +41,8 @@ def main():
             gridAuto.draw()
             turnText = index.Text_box("Turn of: " + turn, (700, 100), 50, index.BLACK)
             turnText.draw()
-            # draw text name player
             name1.draw()
             nameAuto.draw()
-            # draw text the number target remain grid.countTargetAlive()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             targetAuto = index.Text_box("Target Alive: " + str(gridAuto.countTargetAlive()), (1200, 800), 50, index.BLACK)
 
@@ -72,7 +70,6 @@ def main():
                     if gridAuto.changeTurn():
                         turn = "Computer"
                 if turn == "Computer":
-                    # draw text turn
                     gridAuto.resetTurn()
                     gridAuto.offAttacked()
                     grid1.onAttacked()
@@ -93,8 +90,6 @@ def main():
         name1 = index.Text_box("Grid of " + data['name1'], (200, 150), 50, index.BLACK)
         name2 = index.Text_box("Grid of " + data['name2'], (1200, 150), 50, index.BLACK)
 
-
-
         running = True
         while running:
             clock.tick(FPS)
@@ -104,10 +99,8 @@ def main():
             turnText.draw()
             grid1.draw()
             grid2.draw()
-            # draw text name player
             name1.draw()
             name2.draw()
-            # draw text the number target remain grid.countTargetAlive()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
 
@@ -122,7 +115,6 @@ def main():
                 if quitButton.click(event):
                     accueil.main()
                 if turn == data['name1']:
-                    # draw text turn
                     grid1.resetTurn()
                     grid1.offAttacked()
                     grid2.onAttacked()
@@ -135,7 +127,6 @@ def main():
                     if grid2.changeTurn():
                         turn = data['name2']
                 if turn == data['name2']:
-                    # draw text turn
                     grid2.resetTurn()
                     grid2.offAttacked()
                     grid1.onAttacked()
@@ -148,42 +139,36 @@ def main():
                     if grid1.changeTurn():
                         turn = data['name1']
 
-
-
-
-# part must finish ##################################################################################
     elif data['mode'] == 'multi2':
-        running = True
-
+        running = False
+        global n
         n = set_grid.n
         try:
-            game = n.send("get")
             if data["playerId"] == "1":
                 grid1 = index.Grid(gridSize, (200, 300), getData="Player1")
-                game.grid1 = grid1
+                dataGrid1 = grid1.save()
+                game = n.send(dataGrid1)
+                game = n.send("pushed grid")
             else:
                 grid2 = index.Grid(gridSize, (1200, 300), getData="Player1")
-                game.grid2 = grid2
-        except:
+                dataGrid2 = grid2.save()
+                game = n.send(dataGrid2)
+                game = n.send("pushed grid")
+        except Exception as e:
             running = False
+            print(e)
             print("Couldn't get game")
 
-
+        if game.p1PushGrid and game.p2PushGrid:
+            grid1 = game.grid1
+            grid2 = game.grid2
+            game = n.send("toggle grid")
+            running = True
 
         name1 = index.Text_box("Grid of " + game.name1, (200, 150), 50, index.BLACK)
         name2 = index.Text_box("Grid of " + game.name2, (1200, 150), 50, index.BLACK)
 
-
         while running:
-            try:
-                game = n.send("get")
-                grid1 = game.grid1
-                grid2 = game.grid2
-            except:
-                running = False
-                print("Couldn't get game")
-                break
-
             clock.tick(FPS)
             index.window.blit(index.bg_img, (0, 0))
             quitButton.draw()
@@ -191,10 +176,17 @@ def main():
             turnText.draw()
             grid1.draw()
             grid2.draw()
-            # draw text name player
+
+            if data["playerId"] == "1":
+                updateGrid2 = grid2.dataAttacked()
+                game = n.send(updateGrid2)
+                grid1.updateSquare(game.updateGrid1)
+            elif data["playerId"] == "2":
+                updateGrid1 = grid1.dataAttacked()
+                game = n.send(updateGrid1)
+                grid2.updateSquare(game.updateGrid2)
             name1.draw()
             name2.draw()
-            # draw text the number target remain grid.countTargetAlive()
             target1 = index.Text_box("Target Alive: " + str(grid1.countTargetAlive()), (200, 800), 50, index.BLACK)
             target2 = index.Text_box("Target Alive: " + str(grid2.countTargetAlive()), (1200, 800), 50, index.BLACK)
 
@@ -208,28 +200,32 @@ def main():
                     sys.exit()
                 if quitButton.click(event):
                     accueil.main()
-                if game.turn == 1 and data['playerId'] == '1':
-                    # draw text turn
+                if game.turn == 1:
                     grid1.resetTurn()
                     grid1.offAttacked()
-                    grid2.onAttacked()
-                    grid2.attacked(event)
-                    if grid2.changeTurn():
-                        game.turn = 2
-                if game.turn == 2 and data['playerId'] == '2':
-                    # draw text turn
+                    if data["playerId"] == "1":
+                        grid2.onAttacked()
+                        grid2.attacked(event)
+                        if grid2.changeTurn():
+                            game = n.send("turn 2")
+                if game.turn == 2:
                     grid2.resetTurn()
                     grid2.offAttacked()
-                    grid1.onAttacked()
-                    grid1.attacked(event)
-                    if grid1.changeTurn():
-                        game.turn = 1
+                    if data['playerId'] == '2':
+                        grid1.onAttacked()
+                        grid1.attacked(event)
+                        if grid1.changeTurn():
+                            game = n.send("turn 1")
             if grid2.countTargetAlive() == 0:
-                game.winner = data['name1']
-                game = n.send("get")
+                if data["playerId"] == "1":
+                    game = n.send("1")
+                    updateGrid2 = grid2.dataAttacked()
+                    game = n.send(updateGrid2)
                 result.main()
             if grid1.countTargetAlive() == 0:
-                game.winner = data['name1']
-                game = n.send("get")
+                if data["playerId"] == "2":
+                    game = n.send("2")
+                    updateGrid1 = grid1.dataAttacked()
+                    game = n.send(updateGrid1)
                 result.main()
 
